@@ -221,7 +221,11 @@ public class ItemUtils {
         if (CraftBukkit.ITEMSTACK.isCraftItemStack(itemStack)) {
             pdc = me.matl114.matlib.nmsUtils.ItemUtils.getPersistentDataContainerView(itemStack, false);
         } else {
-            pdc = itemStack.getItemMeta().getPersistentDataContainer();
+            // Bukkit 侧无 meta 的物品不可能挂 SF PDC, 直接短路, 避免触发昂贵的 getItemMeta() 反序列化.
+            if (!itemStack.hasItemMeta()) return null;
+            ItemMeta meta = itemStack.getItemMeta();
+            if (meta == null) return null;
+            pdc = meta.getPersistentDataContainer();
         }
 
         if (pdc == null) return null;
